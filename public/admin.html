@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — WEEKS Audio Design</title>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f0d;
+      --surface:   #111;
+      --surface2:  #161616;
+      --border:    #222;
+      --green:     #4a7c59;
+      --green-glow:#7aab8a;
+      --red:       #b03020;
+      --text:      #d0d0d0;
+      --text-dim:  #555;
+      --mono:      'Audiowide', sans-serif;
+      --sans:      'Inter', sans-serif;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 1.5rem;
+    }
+
+    .login-title {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input[type="password"], input[type="text"], input[type="number"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--green); }
+
+    .btn-primary {
+      background: var(--green);
+      border: none;
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .btn-primary:hover { background: var(--green-glow); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-danger {
+      background: none;
+      border: 1px solid var(--red);
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+
+    .error-msg {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--red);
+      text-align: center;
+    }
+
+    /* ── ADMIN SCREEN ── */
+    #admin-screen { display: none; }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .admin-logo {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--green-glow);
+    }
+
+    .admin-nav {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .admin-nav a {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .admin-nav a:hover { color: var(--text); }
+
+    .admin-body {
+      max-width: 720px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.22em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .section-hint {
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      color: #3a3a3a;
+      text-transform: none;
+    }
+
+    /* ── UPLOAD FORM ── */
+    .upload-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    /* Drop zone */
+    .drop-zone {
+      border: 1px dashed #333;
+      background: var(--surface2);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .drop-zone.dragover {
+      border-color: var(--green);
+      background: rgba(42,106,42,0.08);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .drop-zone-label {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    .drop-zone-label span {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      color: var(--green);
+    }
+    .drop-zone-sub {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: #444;
+      margin-top: 0.5rem;
+      pointer-events: none;
+    }
+    #audio-file-name {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--green-glow);
+      margin-top: 0.5rem;
+      pointer-events: none;
+    }
+
+    /* Form fields */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    /* Contract upload */
+    .contract-zone {
+      border: 1px dashed #222;
+      background: var(--surface2);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+    .contract-zone:hover { border-color: #333; }
+    .contract-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+    }
+    .contract-zone-text {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+    #contract-file-name {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--green-glow);
+    }
+
+    /* Stripe info note */
+    .stripe-note {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      color: #444;
+      margin-top: 0.3rem;
+      line-height: 1.6;
+    }
+    .stripe-note strong {
+      color: var(--green-glow);
+      font-weight: normal;
+    }
+
+    /* Progress */
+    .upload-progress {
+      display: none;
+      margin-top: 1.5rem;
+    }
+    .progress-bar-wrap {
+      background: #1a1a1a;
+      height: 2px;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green-glow);
+      transition: width 0.3s;
+      width: 0%;
+    }
+    .progress-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+    }
+
+    .submit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+    .btn-primary.submit-btn { width: auto; padding: 0.75rem 2.5rem; }
+
+    /* ── TRACK LIST (drag-and-drop) ── */
+    .track-manage-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0.5rem;
+      border-bottom: 1px solid #181818;
+      gap: 0.75rem;
+      cursor: grab;
+      transition: background 0.15s, opacity 0.15s, border-top-color 0.15s;
+      border-top: 2px solid transparent;
+    }
+    .track-manage-row:active { cursor: grabbing; }
+    .track-manage-row.dragging { opacity: 0.35; }
+    .track-manage-row.drag-over { border-top-color: var(--green-glow); }
+    .track-manage-row:hover { background: #131313; }
+
+    .track-manage-left {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      min-width: 0;
+    }
+
+    .drag-handle {
+      font-size: 0.95rem;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .track-manage-name {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-manage-meta {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+    }
+
+    .success-toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--green);
+      color: #fff;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 0.75rem 1.5rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .success-toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-title">WEEKS Audio Design — Admin</div>
+    <div class="login-box">
+      <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')login()" />
+      <button class="btn-primary" onclick="login()">ENTER</button>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div id="admin-screen">
+    <div class="admin-header">
+      <div class="admin-logo">WEEKS® — ADMIN</div>
+      <div class="admin-nav">
+        <a href="index.html" target="_blank">VIEW SITE</a>
+        <button class="btn-danger" onclick="logout()">LOG OUT</button>
+      </div>
+    </div>
+
+    <div class="admin-body">
+
+      <!-- UPLOAD FORM -->
+      <div class="section-label">Upload New Track</div>
+      <div class="upload-panel">
+
+        <!-- Audio drop zone -->
+        <div class="drop-zone" id="audio-drop">
+          <input type="file" id="audio-file" accept="audio/*,.mp3,.wav,.flac,.aac,.m4a,.ogg" onchange="onAudioPick(this)" />
+          <div class="drop-zone-label">
+            <span>&#9835;</span>
+            Drop audio file here or click to browse
+          </div>
+          <div class="drop-zone-sub">MP3 · WAV · FLAC · AAC</div>
+          <div id="audio-file-name"></div>
+        </div>
+
+        <!-- Fields -->
+        <div class="form-grid">
+          <div class="field">
+            <label>Song Name</label>
+            <input type="text" id="f-name" placeholder="Track title" />
+          </div>
+          <div class="field">
+            <label>Price (USD)</label>
+            <input type="number" id="f-price" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div class="field full">
+            <label>Contract File <span style="color:#333">— optional</span></label>
+            <div class="contract-zone" id="contract-drop">
+              <input type="file" id="contract-file" accept=".pdf,.doc,.docx" onchange="onContractPick(this)" />
+              <div class="contract-zone-text">&#128196; Drop contract PDF here or click to browse</div>
+              <div id="contract-file-name"></div>
+            </div>
+          </div>
+          <div class="field full">
+            <div class="stripe-note">
+              Checkout is handled by <strong>Stripe</strong>. When a customer clicks BUY they are sent to a Stripe-hosted payment page and automatically redirected to the download after purchase. If a contract file is attached, it becomes downloadable on the success page alongside the audio file. Make sure <strong>STRIPE_SECRET_KEY</strong> and <strong>SITE_URL</strong> are set in your Netlify environment variables.
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="upload-progress" id="upload-progress">
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-label" id="progress-label">Uploading...</div>
+        </div>
+
+        <div class="submit-row">
+          <button class="btn-primary submit-btn" id="submit-btn" onclick="uploadTrack()">UPLOAD TRACK</button>
+        </div>
+      </div>
+
+      <!-- EXISTING TRACKS -->
+      <div class="section-label">
+        <span>Manage Tracks</span>
+        <span class="section-hint">Drag rows to reorder</span>
+      </div>
+      <div id="manage-list">
+        <div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-dim)">Loading...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="success-toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script>
+    const _supa = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const ADMIN_PASSWORD = "weeks2024admin"; // Change this to your own password
+
+    let manageTracks = [];
+    let dragSrcIndex = null;
+
+    // ── Auth ──
+    function login() {
+      const pw = document.getElementById('pw-input').value;
+      if (pw === ADMIN_PASSWORD) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'block';
+        loadManageTracks();
+      } else {
+        document.getElementById('login-error').textContent = 'Incorrect password.';
+      }
+    }
+    function logout() {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('admin-screen').style.display = 'none';
+      document.getElementById('pw-input').value = '';
+    }
+
+    // ── File picks ──
+    function onAudioPick(input) {
+      const f = input.files[0];
+      document.getElementById('audio-file-name').textContent = f ? f.name : '';
+    }
+    function onContractPick(input) {
+      const f = input.files[0];
+      document.getElementById('contract-file-name').textContent = f ? f.name : '';
+    }
+
+    // Drag styling for the upload drop zones
+    ['audio-drop','contract-drop'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+      el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+      el.addEventListener('drop', () => el.classList.remove('dragover'));
+    });
+
+    // ── Upload ──
+    async function uploadTrack() {
+      const name      = document.getElementById('f-name').value.trim();
+      const price     = document.getElementById('f-price').value;
+      const audioF    = document.getElementById('audio-file').files[0];
+      const contractF = document.getElementById('contract-file').files[0];
+
+      if (!name)   return alert('Please enter a song name.');
+      if (!price)  return alert('Please enter a price.');
+      if (!audioF) return alert('Please select an audio file.');
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      showProgress(true, 'Uploading audio...');
+
+      // Upload audio
+      const audioPath = `audio/${Date.now()}_${audioF.name}`;
+      const { error: audioErr } = await _supa.storage
+        .from('tracks')
+        .upload(audioPath, audioF, { cacheControl: '3600', upsert: false });
+      if (audioErr) { alert('Audio upload failed: ' + audioErr.message); reset(); return; }
+
+      setProgress(60, 'Saving track...');
+
+      // Get public URL
+      const { data: urlData } = _supa.storage.from('tracks').getPublicUrl(audioPath);
+      const audioUrl = urlData.publicUrl;
+
+      // Upload contract if provided
+      let contractUrl = null;
+      if (contractF) {
+        setProgress(70, 'Uploading contract...');
+        const contractPath = `contracts/${Date.now()}_${contractF.name}`;
+        const { error: cErr } = await _supa.storage
+          .from('tracks')
+          .upload(contractPath, contractF, { cacheControl: '3600', upsert: false });
+        if (!cErr) {
+          const { data: cUrl } = _supa.storage.from('tracks').getPublicUrl(contractPath);
+          contractUrl = cUrl.publicUrl;
+        }
+      }
+
+      setProgress(80, 'Saving to database...');
+
+      // New tracks go to the bottom of the order: find current max sort_order
+      const { data: maxRows } = await _supa
+        .from('tracks')
+        .select('sort_order')
+        .order('sort_order', { ascending: false, nullsFirst: false })
+        .limit(1);
+      const nextOrder = (maxRows && maxRows.length && maxRows[0].sort_order !== null)
+        ? maxRows[0].sort_order + 1
+        : 0;
+
+      // Insert record
+      const { error: dbErr } = await _supa.from('tracks').insert([{
+        name,
+        price:        parseFloat(price),
+        audio_url:    audioUrl,
+        contract_url: contractUrl,
+        sort_order:   nextOrder,
+      }]);
+
+      if (dbErr) { alert('Database error: ' + dbErr.message); reset(); return; }
+
+      setProgress(100, 'Done!');
+      setTimeout(() => {
+        showProgress(false);
+        showToast('Track uploaded successfully');
+        clearForm();
+        loadManageTracks();
+        btn.disabled = false;
+      }, 600);
+    }
+
+    // ── Manage tracks (load + render) ──
+    async function loadManageTracks() {
+      const { data } = await _supa
+        .from('tracks')
+        .select('*')
+        .order('sort_order', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: true });
+      manageTracks = data || [];
+      renderManageList();
+    }
+
+    function renderManageList() {
+      const list = document.getElementById('manage-list');
+      if (manageTracks.length === 0) {
+        list.innerHTML = '<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-dim);padding:1rem 0">No tracks uploaded yet.</div>';
+        return;
+      }
+      list.innerHTML = manageTracks.map((t, i) => `
+        <div class="track-manage-row"
+             draggable="true"
+             data-index="${i}"
+             ondragstart="onRowDragStart(event)"
+             ondragover="onRowDragOver(event)"
+             ondragleave="onRowDragLeave(event)"
+             ondrop="onRowDrop(event)"
+             ondragend="onRowDragEnd(event)">
+          <div class="track-manage-left">
+            <span class="drag-handle" title="Drag to reorder">&#9776;</span>
+            <div style="min-width:0">
+              <div class="track-manage-name">${escHtml(t.name)}</div>
+              <div class="track-manage-meta">$${Number(t.price).toFixed(2)} · Stripe checkout · ${t.contract_url ? 'Contract attached' : 'No contract'}</div>
+            </div>
+          </div>
+          <button class="btn-danger" onclick="deleteTrack('${t.id}', '${escHtml(t.name)}')">DELETE</button>
+        </div>
+      `).join('');
+    }
+
+    // ── Drag and drop reordering ──
+    function onRowDragStart(e) {
+      dragSrcIndex = Number(e.currentTarget.dataset.index);
+      e.currentTarget.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try { e.dataTransfer.setData('text/plain', String(dragSrcIndex)); } catch(_) {}
+    }
+    function onRowDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.classList.add('drag-over');
+    }
+    function onRowDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+    async function onRowDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      const targetIndex = Number(e.currentTarget.dataset.index);
+      if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+
+      const [moved] = manageTracks.splice(dragSrcIndex, 1);
+      manageTracks.splice(targetIndex, 0, moved);
+      dragSrcIndex = null;
+
+      renderManageList();
+      await persistOrder();
+    }
+    function onRowDragEnd(e) {
+      e.currentTarget.classList.remove('dragging');
+      document.querySelectorAll('.track-manage-row').forEach(r => r.classList.remove('drag-over'));
+    }
+
+    async function persistOrder() {
+      try {
+        await Promise.all(manageTracks.map((t, i) =>
+          _supa.from('tracks').update({ sort_order: i }).eq('id', t.id)
+        ));
+        showToast('Track order updated');
+      } catch (e) {
+        alert('Could not save new order: ' + e.message);
+        loadManageTracks();
+      }
+    }
+
+    async function deleteTrack(id, name) {
+      if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+      await _supa.from('tracks').delete().eq('id', id);
+      showToast('Track deleted');
+      loadManageTracks();
+    }
+
+    // ── Helpers ──
+    function showProgress(show, label) {
+      document.getElementById('upload-progress').style.display = show ? 'block' : 'none';
+      if (label) document.getElementById('progress-label').textContent = label;
+    }
+    function setProgress(pct, label) {
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = label;
+    }
+    function reset() {
+      document.getElementById('submit-btn').disabled = false;
+      showProgress(false);
+    }
+    function clearForm() {
+      ['f-name','f-price'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('audio-file').value = '';
+      document.getElementById('contract-file').value = '';
+      document.getElementById('audio-file-name').textContent = '';
+      document.getElementById('contract-file-name').textContent = '';
+    }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>
